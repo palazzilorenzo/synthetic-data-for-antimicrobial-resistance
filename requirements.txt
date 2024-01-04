@@ -1,7 +1,7 @@
 numpy
 matplotlib
 pandas
-json
+jsonlib
 scikit-learn
 tensorflow>=2.14.0
 keras>=2.14.0
