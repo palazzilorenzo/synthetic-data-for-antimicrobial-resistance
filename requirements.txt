@@ -7,3 +7,4 @@ tensorflow>=2.14.0
 keras>=2.14.0
 sdmetrics
 imageio
+notebook
