@@ -39,9 +39,12 @@ This work will provide a model based on Variational AutoEncoders (VAEs) and Cond
 [4] Weis C, Cuénod A, Rieck B et al. Direct antimicrobial resistance prediction from clinical MALDI-TOF mass spectra using machine learning. Nat Med 28, 164–174 (2022). https://doi.org/10.1038/s41591-021-01619-9. 
 
 ## Contents
-synthetic-data-for-mass-spectrometry is composed of a series of modules contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/docs) and notebooks in [notebook](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/notebook):
-- modules define classes and methods useful to create the VAE/CVAE model.
-- notebook contains jupyter notebooks that allow to train the model, generate new data and test their quality w.r.t. real data.
+synthetic-data-for-mass-spectrometry is composed of a series of modules contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/docs) and [VAE](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/VAE)/[CVAE](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/CVAE) folders, according to the model one want to use:
+
+- docs contains modules defining classes and methods useful to create the VAE/CVAE model.
+- VAE/CVAE contains modules that allow to train the model and generate new data, and save all the informations.
+
+Some examples are also present in the [notebook](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/notebook) folder.
 
 For a better description of each module:
 
@@ -52,17 +55,14 @@ For a better description of each module:
 | create_cvae | contains the architecture of the CVAE model, i.e. encoder and decoder architecture |
 | create_vae | contains the architecture of the VAE model, i.e. encoder and decoder architecture |
 | sampling | contains method to sample z, the vector encoding a digit. |
+| utils | this module contains useful methods to access data, load models, train them and run predictions |
 
 For a better description of each notebook:
 
-| **Notebook** | **Description** |
+| **VAE/CVAE** | **Description** |
 |:----------:|:---------------:|
-| cvae_training | allows to build and train the CVAE model, saving weights and losses.	|
-| cvae_prediction | allows to run predictions for CVAE model, i.e. generate new synthetic data.	|
-| cvae_results | allows to test the quality of new data for CVAE model, also provides	graphical informations. |
-| vae_training | allows to build and train the VAE model, saving weights and losses.	|
-| vae_prediction | allows to run predictions for VAE model, i.e. generate new synthetic data.	|
-| vae_results | allows to test the quality of new data for VAE model, also provides	graphical informations. |
+| train_vae/cvae | allows to build and train the VAE/CVAE model, saving weights and losses.	|
+| prediction_vae/cvae | allows to run predictions with existing VAE/CVAE model, i.e. generate new synthetic data.	|
 
 ## Prerequisites
 
@@ -89,16 +89,82 @@ pip install -r requirements.txt
 
 ## Usage
 
-Once you have installed all the requirements, you can start to generate and test new set of data. 
-First open Jupyter Notebook with:
-
+Once you have installed all the requirements, you can start by training your model/s. 
+#### Step 1:
+According to the model you want to use (cvae or vae):
 ```bash
-   jupyter notebook 
+   python CVAE/train_cvae.py model_dim
+```
+or
+```bash
+   python VAE/train_vae.py model_dim
+```
+where 
+* ```model``` is the name of the model you want to use, i.e. cvae or vae (required) ;
+* ```dim``` is the dimension of the latent space, i.e. the space in which data are represented after encoding process (required).
+>:warning: ```model``` and ```dim``` must be separated by the '_' character.
+
+Example: 
+```bash
+   python CVAE/train_cvae.py cvae_64
+```
+or
+```bash
+   python VAE/train_vae.py vae_64
+```
+You can train more than one model in the same execution by separate them by one space.
+>:warning: ```model``` must be the same, ```dim``` can change.
+
+Example:
+```bash
+   python VAE/train_vae.py vae_32 vae_64
 ```
 
-Then from the Jupyter dashboard you can choose which notebook to run. For example, to simply generate new dataset from existing model, run vae_prediction.ipynb or cvae_prediction.ipynb according to the model one want to use, and save them with new name.
+#### Step 2:
+Now that you have built and trained your model/s, you can generate new set of synthetic data.
+```bash
+   python CVAE/prediction_cvae.py model_dim
+```
+or
+```bash
+   python VAE/prediction_vae.py model_dim
+```
+Same rules as before for ```model_dim```.
 
-Follow instruction inside the notebooks to create new models, train them and run predictions.
+Synhtetic data are saved as ```prediction_model_dim``` format.
+
+#### Step 3:
+You can now test the quality and validity of your new data w.r.t. the real ones by running:
+or
+```bash
+   python test_metrics.py file_name
+```
+where
+* ```file_name``` is the name of the file containing the synthetic data you want to test.
+>:warning: ```file_name``` must not contain the file extension.
+
+Examle:
+```bash
+   python test_metrics.py prediction_cvae_64
+```
+
+## Author
+* <img src="https://avatars.githubusercontent.com/u/135356553?v=4" width="25px;"/> **Lorenzo Palazzi** [git](https://github.com/palazzilorenzo)
+
+### Citation
+
+If you have found `synthetic-data-for-mass-spectrometry` helpful in your research, please
+consider citing this project
+
+```BibTeX
+@misc{Synthetic data for mass spectrometry,
+  author = {Palazzi, Lorenzo},
+  title = {Synthetic data for mass spectrometry},
+  year = {2024},
+  publisher = {GitHub},
+  howpublished = {\url{https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry}},
+}
+```
 
 
 
