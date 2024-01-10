@@ -9,7 +9,7 @@
 # synthetic-data-for-mass-spectrometry
 
 This package allows to generate synthetic tabular data for AMR using [Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/vae_structure.png) and [Conditional Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/cvae_structure.png).
-This package provides a series of modules and notebook to build and train the models, generate new data starting from real ones, and test their quality and validity through the [SDMetrics](https://docs.sdv.dev/sdmetrics/) package. 
+The modules allow to build and train the models, generate new data starting from real ones, and test their quality and validity through the [SDMetrics](https://docs.sdv.dev/sdmetrics/) package. 
 
 1. [Overview](#Overview)
 2. [Contents](#Contents)
@@ -43,6 +43,9 @@ synthetic-data-for-mass-spectrometry is composed of a series of modules containe
 
 - docs contains modules defining classes and methods useful to create the VAE/CVAE model.
 - VAE/CVAE contains modules that allow to train the model and generate new data, and save all the informations.
+
+With VAE model you can generate Escherichia coli spectra susceptible to Meropenem antibiotic.
+With Conditional VAE model you can generate Escherichia coli spectra, both resistant and susceptible to Ampicillin antibiotic.
 
 Some examples are also present in the [notebook](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/notebook) folder.
 
