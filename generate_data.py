@@ -1,6 +1,6 @@
 """
 prediction_vae.py: 
-    this module allows to generate new synthetic data using a Variational AutoEncoder.
+    this module allows to generate new synthetic data using both CVAE and VAE.
 """
 
 __author__ = ['Lorenzo Palazzi']
@@ -19,9 +19,9 @@ from docs.utils import Predict_data
 
 
 def Argv_error():
-    message = '''\nYou have to specify the model name.\n 
-    Please follow the instructions and provide one or more model names.\n
-    Ex.: '--python prediction_vae.py vae_n'
+    message = '''\nYou have to specify the model.\n 
+    Please follow the instructions and provide one or more model/s.\n
+    Ex.: '--python generate_data.py model_dim'
     '''
     return print(message)
 
