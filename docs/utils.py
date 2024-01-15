@@ -26,60 +26,114 @@ from sdmetrics.reports.single_table import DiagnosticReport
 from docs.create_vae import Vae
 from docs.create_cvae import Cvae
 
-###############################
-##                           ##
-##  VARIATIONAL AUTOENCODER  ##
-##                           ##
-###############################
+##############################
+##                          ##
+##   GET DATA,              ##
+##   LOAD AND TRAIN MODEL,  ##
+##   RUN PREDICTION         ##
+##                          ##
+##############################
 
-def Get_vae_training_data():
+def Get_training_data(model_name):
     '''
     
     Import training data and 
-    prepare it to train the VAE model
+    prepare it to train the model
     
     '''
-    script_dir = os.getcwd()  # Script directory
-    path_to_data = os.path.join(script_dir,'VAE/real_data/train/Escherichia_coli_VAE_train')
+    work_dir = os.getcwd()  # Working directory
     extension = '.csv'
     
-    train = pd.read_csv(path_to_data + extension, sep='\t', header=0)
+    if model_name == 'vae':
+        
+        path_to_train = os.path.join(work_dir,f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train')
+        
+        train = pd.read_csv(path_to_train + extension, sep='\t', header=0)
+        
+        # Remove the 'Unnamed: 0' column
+        train = train.drop(['Unnamed: 0'],  axis = 1)
+        
+        return train
     
-    # Remove the 'Unnamed: 0' column
-    train = train.drop(['Unnamed: 0'],  axis = 1)
+    elif model_name == 'cvae':
+        
+        path_to_train_x = os.path.join(work_dir,f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train_x')
+        path_to_train_labels = os.path.join(work_dir,f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train_labels')
+        
+        train_x = pd.read_csv(path_to_train_x + extension, sep='\t', header=0)
+        train_labels = pd.read_csv(path_to_train_labels + extension, sep='\t', header=0)
+        train_x = train_x.drop(['Unnamed: 0'],  axis = 1)
+        train_labels = train_labels.drop(['Unnamed: 0'],  axis = 1)
+        train_labels = to_categorical(train_labels, num_classes=2)
+        
+        return train_x, train_labels
     
-    return train
-
-def Get_vae_testing_data():
+def Get_testing_data(model_name):
     '''
     
     Import testing data and 
-    prepare it to test the VAE model
+    prepare it to test the model
     
     '''
     work_dir = os.getcwd()  # Working directory
-    path_to_data = os.path.join(work_dir,'VAE/real_data/test/Escherichia_coli_VAE_test')
     extension = '.csv'
-    
-    test = pd.read_csv(path_to_data + extension, sep='\t', header=0)
-    
-    # Remove the 'Unnamed: 0' column
-    test = test.drop(['Unnamed: 0'],  axis = 1)
-    
-    # get the list of all columns that will be needed later
-    col = test.columns.values.tolist()
-    
-    return test, col
+    if model_name == 'vae':
+        
+        path_to_data = os.path.join(work_dir,f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test')
+        test = pd.read_csv(path_to_data + extension, sep='\t', header=0)
+        
+        # Remove the 'Unnamed: 0' column
+        test = test.drop(['Unnamed: 0'],  axis = 1)
+        
+        # get the list of all columns that will be needed later
+        col = test.columns.values.tolist()
+        
+        return test, col
+    elif model_name == 'cvae':
+        path_to_test_x = os.path.join(work_dir,f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test_x')
+        path_to_test_labels = os.path.join(work_dir,f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test_labels')
+        extension = '.csv'
 
-def Get_vae_synthetic_data(file_name):
+        test_x = pd.read_csv(path_to_test_x + extension, sep='\t', header=0)
+        test_labels = pd.read_csv(path_to_test_labels + extension, sep='\t', header=0)
+
+        test = pd.concat([test_x, test_labels], axis=1)
+        
+        test_x = test_x.drop(['Unnamed: 0'],  axis = 1)
+
+        test_labels = test_labels.drop(['Unnamed: 0'],  axis = 1)
+        test_labels = to_categorical(test_labels, num_classes=2)
+
+        test = test.drop(['Unnamed: 0'],  axis = 1)
+        col = test.columns.values.tolist()
+        
+        return test_x, test_labels, test, col
+
+def Select_susc_spectra(data):
+            data_susc = data.loc[data['Ampicillin'] == 1] # select only susceptible spectra
+            x_susc = data_susc.drop(['Ampicillin'], axis = 1) # intensity values
+            labels_susc = pd.DataFrame(data_susc['Ampicillin']) # labels
+            labels_susc = to_categorical(labels_susc, num_classes=2)
+            return x_susc, labels_susc
+        
+def Select_res_spectra(data):
+            data_res = data.loc[data['Ampicillin'] == 1] # select only susceptible spectra
+            x_res = data_res.drop(['Ampicillin'], axis = 1) # intensity values
+            labels_res = pd.DataFrame(data_res['Ampicillin']) # labels
+            labels_res = to_categorical(labels_res, num_classes=2)
+            return x_res, labels_res
+
+def Get_synthetic_data(file_name):
     '''
     
-    Get synthetic data from VAE model
-    as Pandas DataFrame
+    Get synthetic data and return it as Pandas DataFrame.
+    
+    Be sure that 'file_name' is in 'prediction_model_dim' format.
     
     '''
     work_dir = os.getcwd()  # Working directory
-    path_to_data = os.path.join(work_dir,f'VAE/synthetic_data/{file_name}')
+    model = file_name.split('_')[1]
+    path_to_data = os.path.join(work_dir,f'{model}/synthetic_data/{file_name}')
     extension = '.csv'
     
     synthetic_data = pd.read_csv(path_to_data + extension, sep='\t', header=0)
@@ -90,248 +144,97 @@ def Get_vae_synthetic_data(file_name):
     return synthetic_data
 
 
-def Load_vae_model(model_name, path_to_weights):
-    latent_dim = int(model_name.split('_')[1])
-    vae = Vae(latent_dim)
-    vae.built = True
-    vae.load_weights(path_to_weights + model_name + '.h5')
-    return vae
-
-def Train_vae(model_name, train_data):
-    # This callback will stop the training when there is no improvement in
-    # the loss for ten consecutive epochs.
-    callback = EarlyStopping(monitor='loss', patience=10)
-    
-    work_dir = os.getcwd()  # Working directory
-    file_path = os.path.join(work_dir,'VAE/weights/' + model_name + '.h5')
-    if os.path.isfile(file_path):
-        print(f'Updating weights for {model_name}')
-        vae = Load_vae_model(model_name, os.path.join(work_dir,'VAE/weights/'))
-        history_vae = vae.fit(train_data, epochs=150, batch_size=9, callbacks=[callback])
-        print("Number of epochs run", len(history_vae.history['loss']))
-        # save weights
-        vae.save_weights(os.path.join(work_dir,'VAE/weights/') + f'{model_name}.h5')
-        # save history on file
-        with open(work_dir + '/VAE/history/' + f'history_{model_name}.json', 'w') as f:
-            json.dump(history_vae.history, f)
-    else:
-        print(f'Starting training for {model_name}')
-        latent_dim = int(model_name.split('_')[1])
+def Load_model(model_dim, path_to_weights):
+    if model_dim.split('_')[0] == 'vae':
+        latent_dim = int(model_dim.split('_')[1])
         vae = Vae(latent_dim)
-        history_vae = vae.fit(train_data, epochs=150, batch_size=9, callbacks=[callback])
-        print("Number of epochs run", len(history_vae.history['loss']))
-        # save weights
-        vae.save_weights(os.path.join(work_dir,'VAE/weights/') + f'{model_name}.h5')
-        # save history on file
-        with open(work_dir + '/VAE/history/' + f'history_{model_name}.json', 'w') as f:
-            json.dump(history_vae.history, f)
+        vae.built = True
+        vae.load_weights(path_to_weights + model_dim + '.h5')
+        return vae
+    elif model_dim.split('_')[0] == 'cvae':
+        latent_dim = int(model_dim.split('_')[1])
+        cvae = Cvae(latent_dim)
+        cvae.built = True
+        cvae.load_weights(path_to_weights + f'{model_dim}.h5')
+        return cvae
 
-def Predict_vae(vae, model_name, data, path_to_weights, col_name):
-    work_dir = os.getcwd()  # Working directory
-    path_to_prediction = os.path.join(work_dir,'VAE/synthetic_data/')
-    print('\n' + 'Run prediction with ' + model_name)
-    # Prediction with VAE
-    encoded = vae.encoder.predict(data)[-1]
-    prediction_vae = vae.decoder.predict(encoded)
-    prediction_vae = prediction_vae.reshape(52, 6000)
-        
-    # normalization
-    prediction_vae = normalize(prediction_vae, norm='l1')
-    df_prediction_vae = pd.DataFrame(prediction_vae, columns=col_name)
-
-    # saving as a CSV file
-    df_prediction_vae.to_csv(path_to_prediction + 'prediction_' + model_name + '.csv', sep ='\t')
-    print('\n' + f'New data for {model_name} saved in:\n' + work_dir + '/VAE/synthetic_data')
-
-
-###############################
-##                           ##
-##        CONDITIONAL        ##
-##  VARIATIONAL AUTOENCODER  ##
-##                           ##
-###############################
-
-
-def Get_cvae_training_data():
-    '''
-    
-    Import training data and 
-    prepare it to train the CVAE model
-    
-    '''
-    work_dir = os.getcwd()  # Working directory
-    path_to_train_x = os.path.join(work_dir,'CVAE/real_data/train/Escherichia_coli_CVAE_train_x')
-    path_to_train_labels = os.path.join(work_dir,'CVAE/real_data/train/Escherichia_coli_CVAE_train_labels')
-    extension = '.csv'
-
-    train_x = pd.read_csv(path_to_train_x + extension, sep='\t', header=0)
-    train_labels = pd.read_csv(path_to_train_labels + extension, sep='\t', header=0)
-    train_x = train_x.drop(['Unnamed: 0'],  axis = 1)
-    train_labels = train_labels.drop(['Unnamed: 0'],  axis = 1)
-    train_labels = to_categorical(train_labels, num_classes=2)
-    
-    return train_x, train_labels
-
-
-def Get_cvae_testing_data():
-    '''
-    
-    Import testing data and 
-    prepare it to test the CVAE model
-    
-    '''
-    work_dir = os.getcwd()  # Working directory
-    path_to_test_x = os.path.join(work_dir,'CVAE/real_data/test/Escherichia_coli_CVAE_test_x')
-    path_to_test_labels = os.path.join(work_dir,'CVAE/real_data/test/Escherichia_coli_CVAE_test_labels')
-    extension = '.csv'
-
-    test_x = pd.read_csv(path_to_test_x + extension, sep='\t', header=0)
-    test_labels = pd.read_csv(path_to_test_labels + extension, sep='\t', header=0)
-
-    test = pd.concat([test_x, test_labels], axis=1)
-    
-    test_x = test_x.drop(['Unnamed: 0'],  axis = 1)
-
-    test_labels = test_labels.drop(['Unnamed: 0'],  axis = 1)
-    test_labels = to_categorical(test_labels, num_classes=2)
-
-    test = test.drop(['Unnamed: 0'],  axis = 1)
-    col = test.columns.values.tolist()
-    
-    return test_x, test_labels, test, col
-
-def Get_cvae_synthetic_data(file_name):
-    '''
-    
-    Get synthetic data from CVAE model
-    as Pandas DataFrame
-    
-    '''
-    work_dir = os.getcwd()  # Working directory
-    path_to_data = os.path.join(work_dir,f'CVAE/synthetic_data/{file_name}')
-    extension = '.csv'
-    
-    synthetic_data = pd.read_csv(path_to_data + extension, sep='\t', header=0)
-    
-    # Remove the 'Unnamed: 0' column
-    synthetic_data = synthetic_data.drop(['Unnamed: 0', 'Ampicillin'],  axis = 1)
-    
-    return synthetic_data
-
-def Load_cvae_model(model_name, path_to_weights):
-    latent_dim = int(model_name.split('_')[1])
-    cvae = Cvae(latent_dim)
-    cvae.built = True
-    cvae.load_weights(path_to_weights + model_name + '.h5')
-    return cvae
-
-def Train_cvae(model_name, train_x, train_labels):
+def Train_model(model_dim, train_data, labels=None):
     # This callback will stop the training when there is no improvement in
     # the loss for ten consecutive epochs.
     callback = EarlyStopping(monitor='loss', patience=10)
     
-    work_dir = os.getcwd()  # Working directory
-    file_path = os.path.join(work_dir,'CVAE/weights/' + model_name + '.h5')
+    work_dir = os.getcwd() # Working directory
+    model_name = model_dim.split('_')[0]
+    file_path = os.path.join(work_dir,f'{model_name}/weights/{model_dim}.h5')
     if os.path.isfile(file_path):
-        print(f'Updating weights for {model_name}')
-        cvae = Load_cvae_model(model_name, os.path.join(work_dir,'CVAE/weights/'))
-        history_cvae = cvae.fit(train_x, train_labels, batch_size=6, epochs=120, callbacks=[callback])
-        print("Number of epochs run", len(history_cvae.history['loss']))
+        print(f'Updating weights for {model_dim}')
+        model = Load_model(model_dim, os.path.join(work_dir,f'{model_name}/weights/'))
+        if model_name=='vae':
+            history_loss = model.fit(train_data, epochs=150, batch_size=9, callbacks=[callback])
+            print("Number of epochs run", len(history_loss.history['loss']))
+        elif model_name=='cvae':
+            history_loss = model.fit(train_data, labels, epochs=150, batch_size=6, callbacks=[callback])
+            print("Number of epochs run", len(history_loss.history['loss']))
         # save weights
-        cvae.save_weights(os.path.join(work_dir,'CVAE/weights/') + f'{model_name}.h5')
+        model.save_weights(os.path.join(work_dir,f'{model_name}/weights/') + f'{model_dim}.h5')
         # save history on file
-        with open(work_dir + '/CVAE/history/' + f'history_{model_name}.json', 'w') as f:
-            json.dump(history_cvae.history, f)
+        with open(work_dir + f'/{model_name}/history/' + f'history_{model_dim}.json', 'w') as f:
+            json.dump(history_loss.history, f)
     else:
-        print(f'Starting training for {model_name}')
-        latent_dim = int(model_name.split('_')[1])
-        cvae = Cvae(latent_dim)
-        history_cvae = cvae.fit(train_x, train_labels, batch_size=6, epochs=120, callbacks=[callback])
-        print("Number of epochs run", len(history_cvae.history['loss']))
+        print(f'Starting training for {model_dim}')
+        latent_dim = int(model_dim.split('_')[1])
+        if model_name=='vae':
+            model = Vae(latent_dim)
+            history_loss = model.fit(train_data, epochs=150, batch_size=9, callbacks=[callback])
+            print("Number of epochs run", len(history_loss.history['loss']))
+        elif model_name=='cvae':
+            model = Cvae(latent_dim)
+            history_loss = model.fit(train_data, labels, epochs=150, batch_size=6, callbacks=[callback])
+            print("Number of epochs run", len(history_loss.history['loss']))
         # save weights
-        cvae.save_weights(os.path.join(work_dir,'CVAE/weights/') + f'{model_name}.h5')
+        model.save_weights(os.path.join(work_dir, f'{model_name}/weights/') + f'{model_dim}.h5')
         # save history on file
-        with open(work_dir + '/CVAE/history/' + f'history_{model_name}.json', 'w') as f:
-            json.dump(history_cvae.history, f)
+        with open(work_dir + f'/{model_name}/history/' + f'history_{model_dim}.json', 'w') as f:
+            json.dump(history_loss.history, f)
 
-def Predict_cvae(cvae, model_name, x, labels, col_name):
+def Predict_data(model, model_dim, data, col_name, labels=None, susc=None):
+    model_name = model_dim.split('_')[0]
     work_dir = os.getcwd()  # Working directory
-    synthetic_data_path = os.path.join(work_dir,'CVAE/synthetic_data/')
-    file_name = synthetic_data_path + 'prediction_' + model_name + '.csv'
-    print('\n' + 'Generate resistant and susceptible spectra with ' + model_name)
-    
-    # prediction
-    encoded = cvae.encoder.predict([x, labels]) # encode data
-    z_sample = encoded[2]
-    prediction_cvae = cvae.decoder.predict([z_sample, labels]) # decode data
-    prediction_cvae = prediction_cvae[:,:,0] 
-    
-    # separate intensity and label values to normalize
-    prediction_cvae_x = prediction_cvae[:,:6000] # intensity
-    prediction_cvae_labels = prediction_cvae[:,-2:] # labels
-    prediction_cvae_labels = np.argmax(prediction_cvae_labels, axis=1) # inverse of 'to_categorical'
-    prediction_cvae_labels = np.expand_dims(prediction_cvae_labels, -1).astype("int32")
-    # normalization
-    prediction_cvae_x_norm = normalize(prediction_cvae_x, norm='l1')
-    # reunite normalized spectra with labels
-    prediction_cvae_norm = np.hstack((prediction_cvae_x_norm, prediction_cvae_labels))
-    df_decoded_norm = pd.DataFrame(prediction_cvae_norm, columns=col_name)
-    # saving as a CSV file
-    df_decoded_norm.to_csv(file_name, sep ='\t')
-    print('\n' + f'New resistant and susceptible spectra for {model_name} saved in:\n' + synthetic_data_path)
+    path_to_prediction = os.path.join(work_dir,f'{model_name}/synthetic_data/')
+    print('\n' + 'Run prediction with ' + model_dim)
+    # Prediction with VAE
+    if model_name=='vae':   
+        encoded = model.encoder.predict(data)[-1]
+        prediction = model.decoder.predict(encoded)
+        prediction = prediction.reshape(52, 6000)
+        # normalization
+        prediction = normalize(prediction, norm='l1')
+    elif model_name=='cvae':
+        # prediction
+        encoded = model.encoder.predict([data, labels]) # encode data
+        z_sample = encoded[2]
+        prediction = model.decoder.predict([z_sample, labels]) # decode data
+        prediction = prediction[:,:,0]
+        # separate intensity and label values to normalize
+        prediction_x = prediction[:,:6000] # intensity
+        prediction_labels = prediction[:,-2:] # labels
+        prediction_labels = np.argmax(prediction_labels, axis=1) # inverse of 'to_categorical'
+        prediction_labels = np.expand_dims(prediction_labels, -1).astype("int32")
+        # normalization
+        prediction_x = normalize(prediction_x, norm='l1')
+        # reunite normalized spectra with labels
+        prediction = np.hstack((prediction_x, prediction_labels))
 
-def Predict_cvae_susc(cvae, model_name, x, labels, col_name):
-    work_dir = os.getcwd()  # Working directory
-    synthetic_data_path = os.path.join(work_dir,'CVAE/synthetic_data/')
-    file_name = synthetic_data_path + 'prediction_' + model_name + '_susc' + '.csv'
-    print('\n' + 'Generate only susceptible spectra with ' + model_name)
+    prediction = pd.DataFrame(prediction, columns=col_name)
+    if susc == 1:
+        prediction.to_csv(path_to_prediction + f'prediction_{model_dim}_susc' + '.csv', sep ='\t')
+    elif susc == 0:
+        prediction.to_csv(path_to_prediction + f'prediction_{model_dim}_res' + '.csv', sep ='\t')
+    else:
+        # saving as a CSV file
+        prediction.to_csv(path_to_prediction + f'prediction_{model_dim}' + '.csv', sep ='\t')
+    print('\n' + f'New data for {model_dim} saved in:\n' + work_dir + f'/{model_name}/synthetic_data')
     
-    # prediction
-    encoded = cvae.encoder.predict([x, labels]) # encode data
-    z_sample = encoded[2]
-    prediction_cvae = cvae.decoder.predict([z_sample, labels]) # decode data
-    prediction_cvae = prediction_cvae[:,:,0] 
-    
-    # separate intensity and label values to normalize
-    prediction_cvae_x = prediction_cvae[:,:6000] # intensity
-    prediction_cvae_labels = prediction_cvae[:,-2:] # labels
-    prediction_cvae_labels = np.argmax(prediction_cvae_labels, axis=1) # inverse of 'to_categorical'
-    prediction_cvae_labels = np.expand_dims(prediction_cvae_labels, -1).astype("int32")
-    # normalization
-    prediction_cvae_x_norm = normalize(prediction_cvae_x, norm='l1')
-    # reunite normalized spectra with labels
-    prediction_cvae_norm = np.hstack((prediction_cvae_x_norm, prediction_cvae_labels))
-    df_decoded_norm = pd.DataFrame(prediction_cvae_norm, columns=col_name)
-    # saving as CSV file
-    df_decoded_norm.to_csv(file_name, sep ='\t')
-    print('\n' + f'New susceptible spectra for {model_name} saved in:\n' + synthetic_data_path)
-    
-def Predict_cvae_res(cvae, model_name, x, labels, col_name):
-    work_dir = os.getcwd()  # Working directory
-    synthetic_data_path = os.path.join(work_dir,'CVAE/synthetic_data/')
-    file_name = synthetic_data_path + 'prediction_' + model_name + '_res' + '.csv'
-    print('\n' + 'Generate only resistant spectra with ' + model_name)
-    
-    # prediction
-    encoded = cvae.encoder.predict([x, labels]) # encode data
-    z_sample = encoded[2]
-    prediction_cvae = cvae.decoder.predict([z_sample, labels]) # decode data
-    prediction_cvae = prediction_cvae[:,:,0] 
-    
-    # separate intensity and label values to normalize
-    prediction_cvae_x = prediction_cvae[:,:6000] # intensity
-    prediction_cvae_labels = prediction_cvae[:,-2:] # labels
-    prediction_cvae_labels = np.argmax(prediction_cvae_labels, axis=1) # inverse of 'to_categorical'
-    prediction_cvae_labels = np.expand_dims(prediction_cvae_labels, -1).astype("int32")
-    # normalization
-    prediction_cvae_x_norm = normalize(prediction_cvae_x, norm='l1')
-    # reunite normalized spectra with labels
-    prediction_cvae_norm = np.hstack((prediction_cvae_x_norm, prediction_cvae_labels))
-    df_decoded_norm = pd.DataFrame(prediction_cvae_norm, columns=col_name)
-    # saving as CSV file
-    df_decoded_norm.to_csv(file_name, sep ='\t')
-    print('\n' + f'New resistant spectra for {model_name} saved in:\n' + synthetic_data_path)
-
 
 ###############################
 ##                           ##
