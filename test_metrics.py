@@ -13,14 +13,15 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from docs.utils import Get_vae_testing_data, Get_vae_synthetic_data, Get_metadata_dict
-from docs.utils import Get_cvae_testing_data, Get_cvae_synthetic_data
+from docs.utils import Get_testing_data, Get_synthetic_data, Get_metadata_dict
+from docs.utils import Select_susc_spectra, Select_res_spectra
 from docs.utils import Generate_quality_report, Generate_diagnostic_report
 
 
-def Generate_vae_reports(file_name, metadata_dict):
-    real_data, _ = Get_vae_testing_data()
-    synthetic_data = Get_vae_synthetic_data(file_name)
+def Generate_vae_reports(prediction_model_dim, metadata_dict):
+    model_name = prediction_model_dim.split('_')[1]
+    real_data, _ = Get_testing_data(model_name)
+    synthetic_data = Get_synthetic_data(prediction_model_dim)
     ''' 
     To reduce computational time we'll test only the range 4400-5600.
     If you want to test the entire set, comment the following two lines. 
@@ -28,33 +29,35 @@ def Generate_vae_reports(file_name, metadata_dict):
     real_data = real_data.iloc[:, 800:1201]
     synthetic_data = synthetic_data.iloc[:, 800:1201]
     
-    Generate_quality_report(file_name, real_data, synthetic_data, metadata_dict)
-    Generate_diagnostic_report(file_name, real_data, synthetic_data, metadata_dict)
+    Generate_quality_report(prediction_model_dim, real_data, synthetic_data, metadata_dict)
+    Generate_diagnostic_report(prediction_model_dim, real_data, synthetic_data, metadata_dict)
     
-def Generate_cvae_reports(file_name, metadata_dict):
-    real_data, _, _, _ = Get_cvae_testing_data()
-    synthetic_data = Get_cvae_synthetic_data(file_name)
-    ''' 
-    To reduce computational time we'll test only the range 4400-5600.
-    If you want to test the entire set, comment the following two lines. 
-    '''
-    real_data = real_data.iloc[:, 800:1201]
-    synthetic_data = synthetic_data.iloc[:, 800:1201]
+def Generate_cvae_reports(prediction_model_dim, metadata_dict):
+    model_name = prediction_model_dim.split('_')[1]
+    _, _, real_data, _ = Get_testing_data(model_name)
+    synthetic_data = Get_synthetic_data(prediction_model_dim)
     
-    if len(file_name.split('_')) == 3:
-        Generate_quality_report(file_name, real_data, synthetic_data, metadata_dict)
-        Generate_diagnostic_report(file_name, real_data, synthetic_data, metadata_dict)
+    if len(prediction_model_dim.split('_')) == 3:
+        ''' 
+        To reduce computational time we'll test only the range 4400-5600.
+        If you want to test the entire set, comment the following two lines. 
+        '''
+        real_data = real_data.iloc[:, 800:1201]
+        synthetic_data = synthetic_data.iloc[:, 800:1201]
+        Generate_quality_report(prediction_model_dim, real_data, synthetic_data, metadata_dict)
+        Generate_diagnostic_report(prediction_model_dim, real_data, synthetic_data, metadata_dict)
     else:
-        if file_name.split('_')[-1] == 'susc':
-            susc_data = real_data.loc[real_data['Ampicillin'] == 1] # select only resistant spectra
-            susc_data = susc_data.drop(['Ampicillin'], axis = 1) # intensity values
-            Generate_quality_report(file_name, susc_data, synthetic_data, metadata_dict)
-            Generate_diagnostic_report(file_name, susc_data, synthetic_data, metadata_dict)
-        elif file_name.split('_')[-1] == 'res':
-            res_data = real_data.loc[real_data['Ampicillin'] == 0] # select only resistant spectra
-            res_data = res_data.drop(['Ampicillin'], axis = 1) # intensity values
-            Generate_quality_report(file_name, res_data, synthetic_data, metadata_dict)
-            Generate_diagnostic_report(file_name, res_data, synthetic_data, metadata_dict)
+        if prediction_model_dim.split('_')[-1] == 'susc':
+            susc_data, _ = Select_susc_spectra(real_data)
+            susc_data = susc_data.iloc[:, 800:1201]
+            synthetic_data = synthetic_data.iloc[:, 800:1201]
+            Generate_quality_report(prediction_model_dim, susc_data, synthetic_data, metadata_dict)
+            Generate_diagnostic_report(prediction_model_dim, susc_data, synthetic_data, metadata_dict)
+        elif prediction_model_dim.split('_')[-1] == 'res':
+            res_data, _ = Select_res_spectra(real_data)
+            res_data = res_data.iloc[:, 800:1201]
+            Generate_quality_report(prediction_model_dim, res_data, synthetic_data, metadata_dict)
+            Generate_diagnostic_report(prediction_model_dim, res_data, synthetic_data, metadata_dict)
         
 
 def Argv_error_1():

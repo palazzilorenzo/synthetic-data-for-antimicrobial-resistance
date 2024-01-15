@@ -5,11 +5,12 @@ Created on Tue Dec 12 16:40:28 2023
 
 @author: Lorenzo Palazzi, University of Bologna - Applied Physics, lorenzo.palazzi@studio.unibo.it
 """
-#import tensorflow as tf
+import tensorflow as tf
 
 from keras import Model
 from keras.metrics import binary_crossentropy, Mean
 from tensorflow.math import reduce_mean, reduce_sum
+from tensorflow import GradientTape
 
 
 # create class to build VAE object
@@ -33,7 +34,7 @@ class VAE(Model):
         ]
 
     def train_step(self, data):
-        with tf.GradientTape() as tape:
+        with GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(data)
             reconstruction = self.decoder(z)
             reconstruction_loss = reduce_mean(
@@ -54,15 +55,6 @@ class VAE(Model):
             "reconstruction_loss": self.reconstruction_loss_tracker.result(),
             "kl_loss": self.kl_loss_tracker.result(),
         }
-
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
