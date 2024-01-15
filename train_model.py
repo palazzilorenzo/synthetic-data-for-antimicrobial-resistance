@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 train_model.py: 
-    this module allows to build and train one or more Conditional Variational/Variational AutoEncoders.
+    this module allows to build and train one or more CVAE/VAE.
 """
 
 __author__ = ['Lorenzo Palazzi']
@@ -20,7 +20,7 @@ from docs.utils import Train_model
 def Argv_error():
     message = '''\nYou have to specify which model to train.\n 
     Please follow the instructions and provide one or more arguments.\n
-    Ex.: '--python train.py cvae_64'
+    Ex.: '--python train_model.py model_dim'
     '''
     return print(message)
 
@@ -36,7 +36,7 @@ def main():
         if model_name=='vae':
             # get training data
             train = Get_training_data(model_name)
-            # preparing data to train the VAE
+            # preparing data to train the model
             train = train.to_numpy()
             train = np.expand_dims(train, -1).astype("float32")
             # start training
@@ -54,7 +54,7 @@ def main():
             if model_name=='vae':
                 # get training data
                 train = Get_training_data(model_name)
-                # preparing data to train the VAE
+                # preparing data to train the model
                 train = train.to_numpy()
                 train = np.expand_dims(train, -1).astype("float32")
                 Train_model(model, train)
