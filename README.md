@@ -39,11 +39,15 @@ This work will provide a model based on Variational AutoEncoders (VAEs) and Cond
 [4] Weis C, Cuénod A, Rieck B et al. Direct antimicrobial resistance prediction from clinical MALDI-TOF mass spectra using machine learning. Nat Med 28, 164–174 (2022). https://doi.org/10.1038/s41591-021-01619-9. 
 
 ## Contents
-synthetic-data-for-mass-spectrometry is composed of a series of modules contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/docs) and [VAE](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/VAE)/[CVAE](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/CVAE) folders, according to the model one want to use:
+synthetic-data-for-mass-spectrometry is composed of three main modules that allow to generate new synthetic data: 
+- ```train_model``` allow to build and train one or more models based on Conditional Variational AutoEncoders model.
+- ```generate_data``` allow to generate new set of synthetic data using an existing model.
+- ```test_metrics``` allow to test the quality and validity of new data w.r.t. the real ones.
 
-- docs contains modules defining classes and methods useful to create the VAE/CVAE model.
-- VAE/CVAE contains modules that allow to train the model and generate new data, and save all the informations.
 
+Some modules are also contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/docs) folder, and contain classes and methods necessary to run the scripts.
+
+**N.B.**
 With VAE model you can generate Escherichia coli spectra susceptible to Meropenem antibiotic.
 With Conditional VAE model you can generate Escherichia coli spectra, both resistant and susceptible to Ampicillin antibiotic.
 
@@ -59,13 +63,9 @@ For a better description of each module:
 | create_vae | contains the architecture of the VAE model, i.e. encoder and decoder architecture |
 | sampling | contains method to sample z, the vector encoding a digit. |
 | utils | this module contains useful methods to access data, load models, train them and run predictions |
-
-For a better description of each notebook:
-
-| **VAE/CVAE** | **Description** |
-|:----------:|:---------------:|
-| train_vae/cvae | allows to build and train the VAE/CVAE model, saving weights and losses.	|
-| prediction_vae/cvae | allows to run predictions with existing VAE/CVAE model, i.e. generate new synthetic data.	|
+| train_model | allow to build and train the model (VAE or CVAE), saving wheights and loss history |
+| generate_data | allow to generate new set of data, using trained models |
+| test_metrics | allow to test the quality and validity of synthetic data w.r.t. real data |
 
 ## Prerequisites
 
@@ -94,51 +94,43 @@ pip install -r requirements.txt
 
 Once you have installed all the requirements, you can start by training your model/s. 
 #### Step 1:
-According to the model you want to use (cvae or vae):
+Create your model and start the training by running: 
 ```bash
-   python CVAE/train_cvae.py model_dim
-```
-or
-```bash
-   python VAE/train_vae.py model_dim
+   python train_model.py model_dim
 ```
 where 
-* ```model``` is the name of the model you want to use, i.e. cvae or vae (required) ;
+* ```model``` is the name of the model you want to use, i.e. 'cvae' or 'vae' (required) ;
 * ```dim``` is the dimension of the latent space, i.e. the space in which data are represented after encoding process (required).
 >:warning: ```model``` and ```dim``` must be separated by the '_' character.
 
 Example: 
 ```bash
-   python CVAE/train_cvae.py cvae_64
+   python train_model.py cvae_64
 ```
 or
 ```bash
-   python VAE/train_vae.py vae_64
+   python train_model.py vae_64
 ```
 You can train more than one model in the same execution by separate them by one space.
->:warning: ```model``` must be the same, ```dim``` can change.
-
-Example:
 ```bash
-   python VAE/train_vae.py vae_32 vae_64
+   python train_model.py cvae_32 cvae_64
+```
+or 
+```bash
+   python train_model.py vae_64 cvae_64
 ```
 
 #### Step 2:
 Now that you have built and trained your model/s, you can generate new set of synthetic data.
 ```bash
-   python CVAE/prediction_cvae.py model_dim
+   python generate_data.py model_dim
 ```
-or
-```bash
-   python VAE/prediction_vae.py model_dim
-```
-Same rules as before for ```model_dim```.
+Same rules as before apply to ```model_dim```.
 
-Synhtetic data are saved as ```prediction_model_dim``` format.
+Synthetic data are saved as ```prediction_model_dim``` format, with the addition of ```susc``` or ```res``` labels at the end for respectively only susceptible and only resistant spectra.
 
 #### Step 3:
 You can now test the quality and validity of your new data w.r.t. the real ones by running:
-or
 ```bash
    python test_metrics.py file_name
 ```
@@ -150,7 +142,10 @@ Examle:
 ```bash
    python test_metrics.py prediction_cvae_64
 ```
-
+or 
+```bash
+   python test_metrics.py prediction_cvae_64_susc
+```
 ## Author
 * <img src="https://avatars.githubusercontent.com/u/135356553?v=4" width="25px;"/> **Lorenzo Palazzi** [git](https://github.com/palazzilorenzo)
 
