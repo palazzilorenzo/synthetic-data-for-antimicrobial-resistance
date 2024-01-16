@@ -132,7 +132,7 @@ def Column_similarity(file_name, column_name=4601):
 def Column_shapes(model):
     report = QualityReport.load(f'reports/quality/quality_report_{model}.pkl')
     fig = report.get_visualization(property_name='Column Shapes')
-    fig.write_image('results/{model}_column_shapes.png', scale=2.0)
+    fig.write_image(f'results/{model}_column_shapes.png', scale=2.0)
     print(f'Figure saved in results/ as {model}_column_shapes.png')
     fig.show()
     
