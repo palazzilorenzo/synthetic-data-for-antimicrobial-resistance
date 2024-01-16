@@ -18,6 +18,7 @@ import json
 
 from keras.utils import to_categorical
 from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
 from keras.callbacks import EarlyStopping
 
 from sdmetrics.reports.single_table import QualityReport
@@ -33,6 +34,70 @@ from docs.create_cvae import Cvae
 ##   RUN PREDICTION         ##
 ##                          ##
 ##############################
+
+def Get_data(model_name):
+    '''
+    
+    Import training data as Pandas DataFrame
+    
+    '''
+    work_dir = os.getcwd()  # Working directory
+    extension = '.txt'
+    
+    if model_name == 'vae':
+        path_to_data = os.path.join(work_dir,f'{model_name}/real_data/Escherichia_coli_{model_name.upper()}')
+        data = pd.read_csv(path_to_data + extension, sep='\t', header=0)
+        # Remove the 'Unnamed: 0' and 'Meropenem' column that will be obsolete for our purpose
+        data = data.drop(['Unnamed: 0', 'Meropenem'],  axis = 1)
+        
+        return data
+    
+    elif model_name == 'cvae':
+        path_to_data = os.path.join(work_dir,f'{model_name}/real_data/Escherichia_coli_{model_name.upper()}')
+        data = pd.read_csv(path_to_data + extension, sep='\t', header=0)
+        # Remove the 'Unnamed: 0' column to select only the intensity values and susceptibility
+        data = data.drop(['Unnamed: 0'],  axis = 1)
+        
+        # Replace 'R' and 'S' with 0 and 1
+        data['Ampicillin'] = data['Ampicillin'].replace('R', 0)
+        data['Ampicillin'] = data['Ampicillin'].replace('S', 1)
+        X = data.drop(['Ampicillin'], axis = 1) # dataframe containing only intensity values
+        labels = pd.DataFrame(data['Ampicillin']) # dataframe containing only susceptibility information
+        
+        return X, labels
+
+def Split_data(model_name):
+    '''
+    Split data into train and test set
+    '''
+    extension = '.csv'
+    if model_name == 'vae':
+        data = Get_data(model_name)
+        train, test = train_test_split(data, random_state=42)
+        
+        path_to_train = f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train'
+        train.to_csv(path_to_train + extension, sep ='\t')
+        
+        path_to_test = f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test'
+        test.to_csv(path_to_test + extension, sep ='\t')
+    elif model_name == 'cvae':
+        data, labels = Get_data(model_name)
+        # Split the data, stratifying by label
+        train_x, test_x, train_labels, test_labels = train_test_split(data, labels,
+                                                                      stratify=labels, 
+                                                                      random_state=42)
+        # saving as a CSV file
+        path_to_train_x = f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train_x'
+        train_x.to_csv(path_to_train_x + extension, sep ='\t')
+        
+        path_to_train_labels = f'{model_name}/real_data/train/Escherichia_coli_{model_name.upper()}_train_labels'
+        train_labels.to_csv(path_to_train_labels + extension, sep ='\t')
+        
+        path_to_test_x = f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test_x'
+        test_x.to_csv(path_to_test_x + extension, sep ='\t')
+        
+        path_to_test_labels = f'{model_name}/real_data/test/Escherichia_coli_{model_name.upper()}_test_labels'
+        train_labels.to_csv(path_to_test_labels + extension, sep ='\t')
 
 def Get_training_data(model_name):
     '''
