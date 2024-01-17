@@ -99,7 +99,7 @@ Once you have installed all the requirements, you can start by training your mod
 #### Step 1:
 Create your model and start the training by running: 
 ```bash
-   python train_model.py model_dim
+python train_model.py model_dim
 ```
 where 
 * ```model``` is the name of the model you want to use, i.e. 'cvae' or 'vae' (required) ;
@@ -108,25 +108,25 @@ where
 
 Example: 
 ```bash
-   python train_model.py cvae_64
+python train_model.py cvae_64
 ```
 or
 ```bash
-   python train_model.py vae_64
+python train_model.py vae_64
 ```
 You can train more than one model in the same execution by separate them by one space.
 ```bash
-   python train_model.py cvae_32 cvae_64
+python train_model.py cvae_32 cvae_64
 ```
 or 
 ```bash
-   python train_model.py vae_64 cvae_64
+python train_model.py vae_64 cvae_64
 ```
 
 #### Step 2:
 Now that you have built and trained your model/s, you can generate new set of synthetic data.
 ```bash
-   python generate_data.py model_dim
+python generate_data.py model_dim
 ```
 Same rules as before apply to ```model_dim```.
 
@@ -135,18 +135,18 @@ Synthetic data are saved as ```prediction_model_dim``` format, with the addition
 #### Step 3:
 You can now test the quality and validity of your new data w.r.t. the real ones by running:
 ```bash
-   python test_metrics.py prediction_model_dim
+python test_metrics.py prediction_model_dim
 ```
 where ```prediction_model_dim``` is the name of the file containing the synthetic data you want to test (required). 
 >:warning: ```prediction_model_dim``` must not contain the file extension.
 
 Examle:
 ```bash
-   python test_metrics.py prediction_cvae_64
+python test_metrics.py prediction_cvae_64
 ```
 or 
 ```bash
-   python test_metrics.py prediction_cvae_64_susc
+python test_metrics.py prediction_cvae_64_susc
 ```
 ```test_metrics.py``` uses SDMetrics package to generate two types of report:
 * [Quality Report](https://docs.sdv.dev/sdmetrics/reports/quality-report), that captures the [Column Shapes](https://docs.sdv.dev/sdmetrics/reports/quality-report/whats-included#column-shapes) and [Column Pair Trends](https://docs.sdv.dev/sdmetrics/reports/quality-report/whats-included#column-pair-trends) properties.
@@ -166,58 +166,58 @@ With ```graphics.py``` module it is possible to visualize different properties, 
 How to use:
 * ```Show_history_loss```
 ```bash
-   python graphics.py Show_history_loss model_dim
+python graphics.py Show_history_loss model_dim
 ```
 Ex.
 ```bash
-   python graphics.py Show_history_loss cvae_64
+python graphics.py Show_history_loss cvae_64
 ```
 ---
 * ```Show_synth_vs_real```
 ```bash
-   python graphics.py Show_synth_vs_real prediction_model_dim
+python graphics.py Show_synth_vs_real prediction_model_dim
 ```
 Ex.
 ```bash
-   python graphics.py Show_synth_vs_real prediction_cvae_64
+python graphics.py Show_synth_vs_real prediction_cvae_64
 ```
 ---
 * ```Column_similarity```
 ```bash
-   python graphics.py Column_similarity prediction_model_dim column
+python graphics.py Column_similarity prediction_model_dim column
 ```
 where ```column``` is optional argument and represents the column for which to show the similarity (default ```column=4601```).
 Ex.
 ```bash
-   python graphics.py Column_similarity prediction_cvae_64 4631
+python graphics.py Column_similarity prediction_cvae_64 4631
 ```
 >:warning: ```column``` ranges from 4400 to 5600 with step of 3 (4400, 4403, 4406 ...). Be sure to chose an existing column.
 ---
 * ```Column_shapes```
 ```bash
-   python graphics.py Column_shapes model_dim
+python graphics.py Column_shapes model_dim
 ```
 Ex.
 ```bash
-   python graphics.py Column_shapes cvae_64
+python graphics.py Column_shapes cvae_64
 ```
 ---
 * ```Column_pair_trends```
 ```bash
-   python graphics.py Column_pair_trends model_dim
+python graphics.py Column_pair_trends model_dim
 ```
 Ex.
 ```bash
-   python graphics.py Column_pair_trends cvae_64
+python graphics.py Column_pair_trends cvae_64
 ```
 ---
 * ```Coverage```
 ```bash
-   python graphics.py Coverage model_dim
+python graphics.py Coverage model_dim
 ```
 Ex.
 ```bash
-   python graphics.py Coverage cvae_64
+python graphics.py Coverage cvae_64
 ```
 
 For a full example on how to use this package please refer to [example_cvae_64](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/blob/main/extras/Example_cvae_64.md).
