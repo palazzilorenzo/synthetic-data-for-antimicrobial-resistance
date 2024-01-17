@@ -227,16 +227,16 @@ For a full example on how to use this package please refer to [example_cvae_64](
 
 ### Citation
 
-If you have found `synthetic-data-for-mass-spectrometry` helpful in your research, please
+If you have found `synthetic-data-for-antimicrobial-resistance` helpful in your research, please
 consider citing this project
 
 ```BibTeX
-@misc{Synthetic data for mass spectrometry,
+@misc{Synthetic data for Antimicrobial Resistance,
   author = {Palazzi, Lorenzo},
-  title = {Synthetic data for mass spectrometry},
+  title = {Synthetic data for Antimicrobial Resistance},
   year = {2024},
   publisher = {GitHub},
-  howpublished = {\url{https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry}},
+  howpublished = {\url{https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance}},
 }
 ```
 
