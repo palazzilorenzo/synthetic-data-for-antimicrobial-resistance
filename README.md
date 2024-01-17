@@ -1,14 +1,14 @@
 | **Author**  | **Project** |
 |:------------:|:-----------:|
-| [**L. Palazzi**](https://github.com/palazzilorenzo) | **Synthetic data for mass spectrometry** |
+| [**L. Palazzi**](https://github.com/palazzilorenzo) | **Synthetic data for antimicrobial resistance** |
 
 ![GitHub stars](https://img.shields.io/github/stars/palazzilorenzo/synthetic-data-for-mass-spectrometry?style=social)
 ![GitHub watchers](https://img.shields.io/github/watchers/palazzilorenzo/synthetic-data-for-mass-spectrometry?label=Watch&style=social
 )
 
-# synthetic-data-for-mass-spectrometry
+# synthetic-data-for-antimicrobial-resistance
 
-This package allows to generate synthetic tabular data for AMR using [Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/vae_structure.png) and [Conditional Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/cvae_structure.png).
+This package allows to generate synthetic tabular data for AMR using [Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/imgs/vae_structure.png) and [Conditional Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/imgs/cvae_structure.png).
 The modules allow to build and train the models, generate new data starting from real ones, and test their quality and validity through the [SDMetrics](https://docs.sdv.dev/sdmetrics/) package. 
 
 1. [Overview](#Overview)
@@ -42,7 +42,7 @@ This work will provide a model based on Variational AutoEncoders (VAEs) and Cond
 [4] Weis C, Cuénod A, Rieck B et al. Direct antimicrobial resistance prediction from clinical MALDI-TOF mass spectra using machine learning. Nat Med 28, 164–174 (2022). https://doi.org/10.1038/s41591-021-01619-9. 
 
 ## Contents
-synthetic-data-for-mass-spectrometry is composed of three main modules that allow to generate new synthetic data: 
+synthetic-data-for-antimicrobial-resistance is composed of three main modules that allow to generate new synthetic data: 
 - ```train_model``` allow to build and train one or more models based on Conditional Variational AutoEncoders model.
 - ```generate_data``` allow to generate new set of synthetic data using an existing model.
 - ```test_metrics``` allow to test the quality and validity of new data w.r.t. the real ones.
@@ -54,7 +54,7 @@ Some modules are also contained in [docs](https://github.com/palazzilorenzo/synt
 With VAE model you can generate Escherichia coli spectra susceptible to Meropenem antibiotic.
 With Conditional VAE model you can generate Escherichia coli spectra, both resistant and susceptible to Ampicillin antibiotic.
 
-Some examples are also present in the [notebook](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/notebook) folder.
+An example is also provided in the [extras](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/extras) folder.
 
 For a better description of each module:
 
@@ -83,8 +83,8 @@ This project use Tensorflow, keras, numpy: see the
 First, clone the git repository and change directory:
 
 ```bash
-git clone https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry.git
-cd synthetic-data-for-mass-spectrometry
+git clone https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance.git
+cd synthetic-data-for-antimicrobial-resistance
 ```
 
 Then, pip-install the requirements and run the setup script:
@@ -219,6 +219,8 @@ Ex.
 ```bash
    python graphics.py Coverage cvae_64
 ```
+
+For a full example on how to use this package please refer to [example_cvae_64](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/blob/main/extras/Example_cvae_64.md).
 
 ## Author
 * <img src="https://avatars.githubusercontent.com/u/135356553?v=4" width="25px;"/> **Lorenzo Palazzi** [git](https://github.com/palazzilorenzo)
