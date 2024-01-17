@@ -16,6 +16,9 @@ The modules allow to build and train the models, generate new data starting from
 3. [Prerequisites](#Prerequisites)
 4. [Installation](#Installation)
 5. [Usage](#Usage)
+6. [Graphics](#Graphics)
+7. [Author](#Author)
+8. [Citation](#Citation)
 
 ## Overview
 
@@ -132,11 +135,10 @@ Synthetic data are saved as ```prediction_model_dim``` format, with the addition
 #### Step 3:
 You can now test the quality and validity of your new data w.r.t. the real ones by running:
 ```bash
-   python test_metrics.py file_name
+   python test_metrics.py prediction_model_dim
 ```
-where
-* ```file_name``` is the name of the file containing the synthetic data you want to test.
->:warning: ```file_name``` must not contain the file extension.
+where ```prediction_model_dim``` is the name of the file containing the synthetic data you want to test (required). 
+>:warning: ```prediction_model_dim``` must not contain the file extension.
 
 Examle:
 ```bash
@@ -146,6 +148,78 @@ or
 ```bash
    python test_metrics.py prediction_cvae_64_susc
 ```
+```test_metrics.py``` uses SDMetrics package to generate two types of report:
+* [Quality Report](https://docs.sdv.dev/sdmetrics/reports/quality-report), that captures the [Column Shapes](https://docs.sdv.dev/sdmetrics/reports/quality-report/whats-included#column-shapes) and [Column Pair Trends](https://docs.sdv.dev/sdmetrics/reports/quality-report/whats-included#column-pair-trends) properties.
+* [Diagnostic Report](https://docs.sdv.dev/sdmetrics/reports/diagnostic-report), that captures the [Coverage](https://docs.sdv.dev/sdmetrics/metrics/metrics-glossary/categorycoverage) and [Boundary](https://docs.sdv.dev/sdmetrics/metrics/metrics-glossary/boundaryadherence) properties.
+
+## Graphics
+With ```graphics.py``` module it is possible to visualize different properties, such as loss history, synthetic vs real data and others.
+| **Method**| **Description**|
+|:---------:|:--------------:|
+| Show_history_loss | Shows the history loss saved during training for a certain model |
+| Show_synth_vs_real | Shows synthetic vs real spectrum (the first of each set) |
+| Column_similarity | Shows the overall distribution of real and synthetic data |
+| Column_shapes | Shows the shape score |
+| Column_pair_trends | Shows the correlation map between real and sinthetic data |
+| Coverage | Shows the coverage score |
+
+How to use:
+* ```Show_history_loss```
+```bash
+   python graphics.py Show_history_loss model_dim
+```
+Ex.
+```bash
+   python graphics.py Show_history_loss cvae_64
+```
+---
+* ```Show_synth_vs_real```
+```bash
+   python graphics.py Show_synth_vs_real prediction_model_dim
+```
+Ex.
+```bash
+   python graphics.py Show_synth_vs_real prediction_cvae_64
+```
+---
+* ```Column_similarity```
+```bash
+   python graphics.py Column_similarity prediction_model_dim column
+```
+where ```column``` is optional argument and represents the column for which to show the similarity (default ```column=4601```).
+Ex.
+```bash
+   python graphics.py Column_similarity prediction_cvae_64 4631
+```
+>:warning: ```column``` ranges from 4400 to 5600 with step of 3 (4400, 4403, 4406 ...). Be sure to chose an existing column.
+---
+* ```Column_shapes```
+```bash
+   python graphics.py Column_shapes model_dim
+```
+Ex.
+```bash
+   python graphics.py Column_shapes cvae_64
+```
+---
+* ```Column_pair_trends```
+```bash
+   python graphics.py Column_pair_trends model_dim
+```
+Ex.
+```bash
+   python graphics.py Column_pair_trends cvae_64
+```
+---
+* ```Coverage```
+```bash
+   python graphics.py Coverage model_dim
+```
+Ex.
+```bash
+   python graphics.py Coverage cvae_64
+```
+
 ## Author
 * <img src="https://avatars.githubusercontent.com/u/135356553?v=4" width="25px;"/> **Lorenzo Palazzi** [git](https://github.com/palazzilorenzo)
 
