@@ -2,13 +2,13 @@
 |:------------:|:-----------:|
 | [**L. Palazzi**](https://github.com/palazzilorenzo) | **Synthetic data for antimicrobial resistance** |
 
-![GitHub stars](https://img.shields.io/github/stars/palazzilorenzo/synthetic-data-for-mass-spectrometry?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/palazzilorenzo/synthetic-data-for-mass-spectrometry?label=Watch&style=social
+![GitHub stars](https://img.shields.io/github/stars/palazzilorenzo/synthetic-data-for-antimicrobial-resistance?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/palazzilorenzo/synthetic-data-for-antimicrobial-resistance?label=Watch&style=social
 )
 
 # synthetic-data-for-antimicrobial-resistance
 
-This package allows to generate synthetic tabular data for AMR using [Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/imgs/vae_structure.png) and [Conditional Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/extras/imgs/cvae_structure.png).
+This package allows to generate synthetic tabular data for AMR using [Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/blob/main/extras/imgs/vae_structure.png) and [Conditional Variational AutoEncoders](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/blob/main/extras/imgs/cvae_structure.png).
 The modules allow to build and train the models, generate new data starting from real ones, and test their quality and validity through the [SDMetrics](https://docs.sdv.dev/sdmetrics/) package. 
 
 1. [Overview](#Overview)
@@ -43,18 +43,18 @@ This work will provide a model based on Variational AutoEncoders (VAEs) and Cond
 
 ## Contents
 synthetic-data-for-antimicrobial-resistance is composed of three main modules that allow to generate new synthetic data: 
-- ```train_model``` allow to build and train one or more models based on Conditional Variational AutoEncoders model.
-- ```generate_data``` allow to generate new set of synthetic data using an existing model.
-- ```test_metrics``` allow to test the quality and validity of new data w.r.t. the real ones.
+- ```train_model.py``` allow to build and train one or more models based on Conditional Variational AutoEncoders model.
+- ```generate_data.py``` allow to generate new set of synthetic data using an existing model.
+- ```test_metrics.py``` allow to test the quality and validity of new data w.r.t. the real ones.
 
 
-Some modules are also contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/docs) folder, and contain classes and methods necessary to run the scripts.
+Some modules are also contained in [docs](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/tree/main/docs) folder, and contain classes and methods necessary to run the scripts.
 
 **N.B.**
 With VAE model you can generate Escherichia coli spectra susceptible to Meropenem antibiotic.
 With Conditional VAE model you can generate Escherichia coli spectra, both resistant and susceptible to Ampicillin antibiotic.
 
-An example is also provided in the [extras](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/tree/main/extras) folder.
+An example is also provided in the [extras](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/tree/main/extras) folder.
 
 For a better description of each module:
 
@@ -76,8 +76,8 @@ Supported python: ![Python version](https://img.shields.io/badge/python--version
 
 First of all ensure to have the right python version installed.
 
-This project use Tensorflow, keras, numpy: see the
-[requirements](https://github.com/palazzilorenzo/synthetic-data-for-mass-spectrometry/blob/main/requirements.txt) for more information.
+This project uses Tensorflow, Keras, Numpy: see the
+[requirements](https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-resistance/blob/main/requirements.txt) for more information.
 
 ## Installation
 First, clone the git repository and change directory:
@@ -87,7 +87,7 @@ git clone https://github.com/palazzilorenzo/synthetic-data-for-antimicrobial-res
 cd synthetic-data-for-antimicrobial-resistance
 ```
 
-Then, pip-install the requirements and run the setup script:
+Then, pip-install the requirements:
 ```bash
 pip install -r requirements.txt
 ```
