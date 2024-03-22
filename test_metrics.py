@@ -56,6 +56,7 @@ def Generate_cvae_reports(prediction_model_dim, metadata_dict):
         elif prediction_model_dim.split('_')[-1] == 'res':
             res_data, _ = Select_res_spectra(real_data)
             res_data = res_data.iloc[:, 800:1201]
+            synthetic_data = synthetic_data.iloc[:, 800:1201]
             Generate_quality_report(prediction_model_dim, res_data, synthetic_data, metadata_dict)
             Generate_diagnostic_report(prediction_model_dim, res_data, synthetic_data, metadata_dict)
         
