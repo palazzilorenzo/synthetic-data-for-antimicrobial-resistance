@@ -19,6 +19,7 @@ from sdmetrics.reports.single_table import QualityReport, DiagnosticReport
 from sdmetrics.visualization import get_column_plot
 
 from docs.utils import Get_testing_data, Get_synthetic_data
+from docs.utils import Select_susc_spectra, Select_res_spectra
 
 def Show_history_loss(model):
     model_name = model.split('_')[0]
@@ -30,6 +31,7 @@ def Show_history_loss(model):
     fig, ax = plt.subplots(1, 1, figsize=(5, 5))
     
     ax.plot(history['loss'])
+    ax.set_yscale('log')
     ax.set_ylabel('loss')
     ax.set_xlabel('epoch')
     ax.set_title(f'{model.upper()}')
@@ -38,7 +40,8 @@ def Show_history_loss(model):
     print(f'Figure saved in results/ as history_{model}.png')
     plt.savefig(fig_path)
     plt.show()
-    
+ 
+
 def Show_synth_vs_real(file_name):
     model_name = file_name.split('_')[1]
     dim = file_name.split('_')[-1]
@@ -90,12 +93,14 @@ def Show_synth_vs_real(file_name):
         fig.savefig(fig_path)
         plt.show()
 
+
 def Column_similarity(file_name, column_name=4601):
     ''' Visualize the similarity between real and synthetic data
         (in this case we selected randomly the column '4601' as default).
      '''
     model_name = file_name.split('_')[1]
-    dim = file_name.split('_')[-1]
+    dim = file_name.split('_')[2]
+    
     if model_name == 'vae':
         real_data, _ = Get_testing_data(model_name)
         synth_data = Get_synthetic_data(file_name)
@@ -112,22 +117,45 @@ def Column_similarity(file_name, column_name=4601):
         
         fig.show()   
     elif model_name == 'cvae':
-        real_data, _, _, _ = Get_testing_data(model_name)
+        test_x, _, test, _ = Get_testing_data(model_name)
+        test_x_susc, _ = Select_susc_spectra(test)
+        test_x_res, _ = Select_res_spectra(test)
         synth_data = Get_synthetic_data(file_name)
         # Remove the 'Ampicillin' column
         synth_data = synth_data.drop(['Ampicillin'],  axis = 1)
-        fig = get_column_plot(
-            real_data=real_data,
+        if file_name.split('_')[-1] == 'susc':
+            fig = get_column_plot(
+                real_data=test_x_susc,
+                synthetic_data=synth_data,
+                column_name=f'{column_name}',
+                plot_type='distplot'
+            )
+            fig_path = f'results/{model_name}_{dim}_susc_similarity_col_{column_name}.png'
+            print(f'Figure saved in results/ as {model_name}_{dim}_susc_similarity_col_{column_name}.png')
+            fig.write_image(fig_path, scale=2.0)
+            fig.show()
+        elif file_name.split('_')[-1] == 'res':
+            fig = get_column_plot(
+                real_data=test_x_res,
+                synthetic_data=synth_data,
+                column_name=f'{column_name}',
+                plot_type='distplot'
+            )
+            fig_path = f'results/{model_name}_{dim}_res_similarity_col_{column_name}.png'
+            print(f'Figure saved in results/ as {model_name}_{dim}_res_similarity_col_{column_name}.png')
+            fig.write_image(fig_path, scale=2.0)
+            fig.show()
+        else: 
+            fig = get_column_plot(
+            real_data=test_x,
             synthetic_data=synth_data,
             column_name=f'{column_name}',
             plot_type='distplot'
-        )
-        
-        fig_path = f'results/{model_name}_{dim}_similarity_col_{column_name}.png'
-        print(f'Figure saved in results/ as {model_name}_{dim}_similarity_col_{column_name}.png')
-        fig.write_image(fig_path, scale=2.0)
-        
-        fig.show()
+            )
+            fig_path = f'results/{model_name}_{dim}_similarity_col_{column_name}.png'
+            print(f'Figure saved in results/ as {model_name}_{dim}_similarity_col_{column_name}.png')
+            fig.write_image(fig_path, scale=2.0)
+            fig.show()
 
 def Column_shapes(model):
     report = QualityReport.load(f'reports/quality/quality_report_{model}.pkl')
