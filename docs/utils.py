@@ -323,24 +323,42 @@ def Get_metadata_dict():
 def Generate_quality_report(file_name, real_data, synthetic_data, metadata_dict):
     model_name = file_name.split('_')[1] + '_' + file_name.split('_')[2]
     work_dir = os.getcwd()  # Working directory
-    quality_reports_path = os.path.join(work_dir,f'reports/quality/quality_report_{model_name}.pkl')
 
     # generate quality report
     report = QualityReport()
     report.generate(real_data, synthetic_data, metadata_dict)
     # save report
-    report.save(filepath=quality_reports_path)
-    print(f'Quality report saved: {quality_reports_path}')
+    if file_name.split('_')[-1] == 'susc':
+        quality_reports_path = os.path.join(work_dir,f'reports/quality/quality_report_{model_name}_susc.pkl')
+        report.save(filepath=quality_reports_path)
+        print(f'Diagnostic report saved: {quality_reports_path}')
+    elif file_name.split('_')[-1] == 'res':
+        quality_reports_path = os.path.join(work_dir,f'reports/quality/quality_report_{model_name}_res.pkl')
+        report.save(filepath=quality_reports_path)
+        print(f'Diagnostic report saved: {quality_reports_path}')
+    else:
+        quality_reports_path = os.path.join(work_dir,f'reports/quality/quality_report_{model_name}.pkl')
+        report.save(filepath=quality_reports_path)
+        print(f'Diagnostic report saved: {quality_reports_path}')
     
 def Generate_diagnostic_report(file_name, real_data, synthetic_data, metadata_dict):
     model_name = file_name.split('_')[1] + '_' + file_name.split('_')[2]
     work_dir = os.getcwd()  # Working directory
-    diagnostic_reports_path = os.path.join(work_dir,f'reports/diagnostic/diagnostic_report_{model_name}.pkl')
 
     # generate quality report
     report = DiagnosticReport()
     report.generate(real_data, synthetic_data, metadata_dict)
     # save report
-    report.save(filepath=diagnostic_reports_path)
-    print(f'Diagnostic report saved: {diagnostic_reports_path}')
+    if file_name.split('_')[-1] == 'susc':
+        diagnostic_reports_path = os.path.join(work_dir,f'reports/diagnostic/diagnostic_report_{model_name}_susc.pkl')
+        report.save(filepath=diagnostic_reports_path)
+        print(f'Diagnostic report saved: {diagnostic_reports_path}')
+    elif file_name.split('_')[-1] == 'res':
+        diagnostic_reports_path = os.path.join(work_dir,f'reports/diagnostic/diagnostic_report_{model_name}_res.pkl')
+        report.save(filepath=diagnostic_reports_path)
+        print(f'Diagnostic report saved: {diagnostic_reports_path}')
+    else:
+        diagnostic_reports_path = os.path.join(work_dir,f'reports/diagnostic/diagnostic_report_{model_name}.pkl')
+        report.save(filepath=diagnostic_reports_path)
+        print(f'Diagnostic report saved: {diagnostic_reports_path}')
 
